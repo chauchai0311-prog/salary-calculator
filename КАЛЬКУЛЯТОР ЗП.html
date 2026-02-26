@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор зарплаты</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+  label { display: block; margin-top: 10px; }
+  input, select { width: 100%; padding: 5px; margin-top: 5px; }
+  button { margin-top: 15px; padding: 10px; width: 100%; background: #4CAF50; color: white; border: none; cursor: pointer; }
+  button:hover { background: #45a049; }
+  .result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+  .kpi { margin-left: 10px; }
+  @media (max-width: 480px) { body { padding: 10px; } }
+</style>
+</head>
+<body>
+<h2>Калькулятор зарплаты продавца</h2>
+<form id="salaryForm">
+<label>
+  <input type="radio" name="employeeType" value="main" checked>
+  Основной сотрудник
+</label>
+<label>
+  <input type="radio" name="employeeType" value="replacement">
+  Замена
+</label>
+  <label>Магазин
+    <select id="store"></select>
+  </label>
+  <label>Месяц
+    <select id="month">
+      <option value="2">Февраль 2026</option>
+      <option value="3">Март 2026</option>
+    </select>
+  </label>
+  <label>Отработанные дни
+    <input type="number" id="workedDays" min="1" required>
+  </label>
+  <label>Фактический ТО (BYN)
+    <input type="number" id="actualTO" min="0" required>
+  </label>
+  <label>% фокусных продаж
+    <input type="number" id="focusPercent" min="0" max="200" required>
+  </label>
+  <label>% сервиса
+    <input type="number" id="servicePercent" min="0" max="200" required>
+  </label>
+  <button type="submit">Рассчитать зарплату</button>
+</form>
+<div class="result" id="result" style="display:none;"></div>
+<script>
+const stores = [
+  {name: 'Грин', category: 'A', salary: 1250, kpiTO: 750, kpiFocus: 250, kpiService: 250, overPercent: 25, planFeb: 62700, planMar: 68500},
+  {name: 'Дана', category: 'A', salary: 1250, kpiTO: 750, kpiFocus: 250, kpiService: 250, overPercent: 25, planFeb: 77800, planMar: 85100},
+  {name: 'Простор', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 38400, planMar: 43000},
+  {name: 'Галерея', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 46400, planMar: 50700},
+  {name: 'Замок', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 42200, planMar: 46100},
+  {name: 'Момо', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 47500, planMar: 51900},
+  {name: 'Галилео', category: 'C', salary: 1000, kpiTO: 600, kpiFocus: 200, kpiService: 200, overPercent: 20, planFeb: 24900, planMar: 27200},
+  {name: 'Скала', category: 'C', salary: 1000, kpiTO: 600, kpiFocus: 200, kpiService: 200, overPercent: 20, planFeb: 26200, planMar: 28600},
+  {name: 'Арена', category: 'D', salary: 900, kpiTO: 540, kpiFocus: 180, kpiService: 180, overPercent: 18, planFeb: 20500, planMar: 22400},
+  {name: 'Гродно', category: 'D', salary: 800, kpiTO: 480, kpiFocus: 160, kpiService: 160, overPercent: 16, planFeb: 22600, planMar: 24700}
+];
+
+const storeSelect = document.getElementById('store');
+stores.forEach(s => { let opt = document.createElement('option'); opt.value = s.name; opt.textContent = s.name; storeSelect.appendChild(opt); });
+
+function daysInMonth(month) { return month==2 ? 28 : 31; }
+
+document.getElementById('salaryForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const storeName = storeSelect.value;
+  const month = parseInt(document.getElementById('month').value);
+  const workedDays = parseInt(document.getElementById('workedDays').value);
+  const actualTO = parseFloat(document.getElementById('actualTO').value);
+  const focusPercent = parseFloat(document.getElementById('focusPercent').value);
+  const servicePercent = parseFloat(document.getElementById('servicePercent').value);
+  const employeeType = document.querySelector('input[name="employeeType"]:checked').value;
+
+  if(workedDays <= 0){ alert('Введите рабочие дни больше 0'); return; }
+
+  const store = stores.find(s=>s.name===storeName);
+  const monthDays = daysInMonth(month);
+  const baseWorkDays = month===2 ? 14 : 15;
+
+  // Оклад
+  const salaryFact = (store.salary / (employeeType === "replacement" ? 15 : baseWorkDays)) * workedDays;
+
+  // План продавца
+  const planStore = month===2 ? store.planFeb : store.planMar;
+  const planSeller = (planStore/monthDays)*workedDays;
+
+  // % выполнения ТО
+  const percentTO = planSeller > 0 ? (actualTO/planSeller)*100 : 0;
+  const overPercentValue = percentTO > 100 ? Math.floor(percentTO - 100) : 0;
+  
+  let kpiTO = 0;
+let overTO = 0;
+let kpiFocus = 0;
+let kpiServiceRes = 0;
+
+if (employeeType === "replacement") {
+
+  // Замена — база всегда 15 дней
+  const salaryReplacementBase = (store.salary / 15) * workedDays;
+
+  // KPI ТО без ограничений и порогов
+  kpiTO = (percentTO / 100) * salaryReplacementBase;
+
+} else {
+
+  // Основной сотрудник
+
+  const kpiTOBase = (store.kpiTO / baseWorkDays) * workedDays;
+  const percentTOForKPI = percentTO > 100 ? 100 : percentTO;
+  kpiTO = (percentTOForKPI / 100) * kpiTOBase;
+
+ overTO = overPercentValue > 0
+  ? overPercentValue * store.overPercent * (workedDays / baseWorkDays)
+  : 0;
+
+  const kpiFocusBase = (store.kpiFocus / baseWorkDays) * workedDays;
+  if (focusPercent >= 85) kpiFocus = kpiFocusBase;
+
+  const kpiServiceBase = (store.kpiService / baseWorkDays) * workedDays;
+  if (servicePercent >= 85) kpiServiceRes = kpiServiceBase;
+}
+
+
+  const total = salaryFact + kpiTO + overTO + kpiFocus + kpiServiceRes;
+
+  // Функция форматирования
+function formatBYN(value) {
+  return Math.round(value).toLocaleString('ru-RU');
+}
+
+document.getElementById('result').style.display='block';
+document.getElementById('result').innerHTML = `
+  <strong>Результаты расчета:</strong><br>
+  План продавца: ${formatBYN(planSeller)} BYN<br>
+  Оклад: ${formatBYN(salaryFact)} BYN<br>
+  KPI ТО (${Math.round(percentTO)}%): ${formatBYN(kpiTO)} BYN<br>
+  Перевыполнение ТО ${overPercentValue > 0 ? `(${Math.round(overPercentValue)}%)` : ''}: ${formatBYN(overTO)} BYN<br>
+  KPI Фокус: ${formatBYN(kpiFocus)} BYN<br>
+  KPI Сервис: ${formatBYN(kpiServiceRes)} BYN<br>
+  <strong>Итого: ${formatBYN(total)} BYN</strong>
+`;
+});
+</script>
+</body>
+</html>
