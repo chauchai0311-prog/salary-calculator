@@ -17,19 +17,39 @@
   .result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
   .kpi { margin-left: 10px; }
   @media (max-width: 480px) { body { padding: 10px; } }
+.employee-type {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.radio-option input {
+  width: auto;
+}
 </style>
 </head>
 <body>
 <h2>Калькулятор зарплаты продавца</h2>
 <form id="salaryForm">
-<label>
-  <input type="radio" name="employeeType" value="main" checked>
-  Основной сотрудник
-</label>
-<label>
-  <input type="radio" name="employeeType" value="replacement">
-  Замена
-</label>
+<div class="employee-type">
+  <label class="radio-option">
+    <input type="radio" name="employeeType" value="main" checked>
+    <span>Основной сотрудник</span>
+  </label>
+
+  <label class="radio-option">
+    <input type="radio" name="employeeType" value="replacement">
+    <span>Замена</span>
+  </label>
+</div>
+
   <label>Магазин
     <select id="store"></select>
   </label>
@@ -70,6 +90,30 @@ const stores = [
 
 const storeSelect = document.getElementById('store');
 stores.forEach(s => { let opt = document.createElement('option'); opt.value = s.name; opt.textContent = s.name; storeSelect.appendChild(opt); });
+
+const employeeRadios = document.querySelectorAll('input[name="employeeType"]');
+const focusInput = document.getElementById('focusPercent');
+const serviceInput = document.getElementById('servicePercent');
+
+function toggleKPIFields() {
+  const selectedType = document.querySelector('input[name="employeeType"]:checked').value;
+
+  if (selectedType === "replacement") {
+    focusInput.disabled = true;
+    serviceInput.disabled = true;
+    focusInput.value = '';
+    serviceInput.value = '';
+  } else {
+    focusInput.disabled = false;
+    serviceInput.disabled = false;
+  }
+}
+
+employeeRadios.forEach(radio => {
+  radio.addEventListener('change', toggleKPIFields);
+});
+
+toggleKPIFields();
 
 function daysInMonth(month) { return month==2 ? 28 : 31; }
 
