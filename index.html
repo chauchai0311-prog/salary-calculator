@@ -114,6 +114,36 @@ employeeRadios.forEach(radio => {
 });
 
 toggleKPIFields();
+// Загрузка сохранённых значений из localStorage
+function loadSavedSelections() {
+  const savedStore = localStorage.getItem('selectedStore');
+  const savedMonth = localStorage.getItem('selectedMonth');
+  
+  if (savedStore) {
+    // Проверяем, существует ли магазин с таким названием в списке
+    const storeExists = Array.from(storeSelect.options).some(opt => opt.value === savedStore);
+    if (storeExists) storeSelect.value = savedStore;
+  }
+  
+  if (savedMonth) {
+    const monthSelect = document.getElementById('month');
+    const monthExists = Array.from(monthSelect.options).some(opt => opt.value === savedMonth);
+    if (monthExists) monthSelect.value = savedMonth;
+  }
+}
+
+// Сохранение при изменении магазина
+storeSelect.addEventListener('change', function() {
+  localStorage.setItem('selectedStore', storeSelect.value);
+});
+
+// Сохранение при изменении месяца
+document.getElementById('month').addEventListener('change', function() {
+  localStorage.setItem('selectedMonth', this.value);
+});
+
+// Вызываем загрузку при старте
+loadSavedSelections();
 
 function daysInMonth(month) { return month==2 ? 28 : 31; }
 
@@ -189,7 +219,7 @@ document.getElementById('result').innerHTML = `
   <strong>Результаты расчета:</strong><br>
   План продавца: ${formatBYN(planSeller)} BYN<br>
   Оклад: ${formatBYN(salaryFact)} BYN<br>
-  KPI ТО (${Math.round(percentTO)}%): ${formatBYN(kpiTO)} BYN<br>
+  KPI ТО (${percentTO.toFixed(1).replace('.', ',')}%): ${formatBYN(kpiTO)} BYN<br>
   Перевыполнение ТО ${overPercentValue > 0 ? `(${Math.round(overPercentValue)}%)` : ''}: ${formatBYN(overTO)} BYN<br>
   KPI Фокус: ${formatBYN(kpiFocus)} BYN<br>
   KPI Сервис: ${formatBYN(kpiServiceRes)} BYN<br>
