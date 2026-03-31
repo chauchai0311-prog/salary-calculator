@@ -57,6 +57,7 @@
     <select id="month">
       <option value="2">Февраль 2026</option>
       <option value="3">Март 2026</option>
+      <option value="4">Апрель 2026</option>
     </select>
   </label>
   <label>Отработанные дни
@@ -76,16 +77,16 @@
 <div class="result" id="result" style="display:none;"></div>
 <script>
 const stores = [
-  {name: 'Грин', category: 'A', salary: 1250, kpiTO: 750, kpiFocus: 250, kpiService: 250, overPercent: 25, planFeb: 62700, planMar: 68500},
-  {name: 'Дана', category: 'A', salary: 1250, kpiTO: 750, kpiFocus: 250, kpiService: 250, overPercent: 25, planFeb: 77800, planMar: 85100},
-  {name: 'Простор', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 38400, planMar: 43000},
-  {name: 'Галерея', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 46400, planMar: 50700},
-  {name: 'Замок', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 42200, planMar: 46100},
-  {name: 'Момо', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 47500, planMar: 51900},
-  {name: 'Галилео', category: 'C', salary: 1000, kpiTO: 600, kpiFocus: 200, kpiService: 200, overPercent: 20, planFeb: 24900, planMar: 27200},
-  {name: 'Скала', category: 'C', salary: 1000, kpiTO: 600, kpiFocus: 200, kpiService: 200, overPercent: 20, planFeb: 26200, planMar: 28600},
-  {name: 'Арена', category: 'D', salary: 900, kpiTO: 540, kpiFocus: 180, kpiService: 180, overPercent: 18, planFeb: 20500, planMar: 22400},
-  {name: 'Гродно', category: 'D', salary: 800, kpiTO: 480, kpiFocus: 160, kpiService: 160, overPercent: 16, planFeb: 22600, planMar: 24700}
+  {name: 'Грин', category: 'A', salary: 1250, kpiTO: 750, kpiFocus: 250, kpiService: 250, overPercent: 25, planFeb: 62700, planMar: 68500, planApr:62900},
+  {name: 'Дана', category: 'A', salary: 1250, kpiTO: 750, kpiFocus: 250, kpiService: 250, overPercent: 25, planFeb: 77800, planMar: 85100, planApr:69500},
+  {name: 'Простор', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 38400, planMar: 43000, planApr:38500},
+  {name: 'Галерея', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 46400, planMar: 50700, planApr:41300},
+  {name: 'Замок', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 42200, planMar: 46100, planApr:38500},
+  {name: 'Момо', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 47500, planMar: 51900, planApr:46500},
+  {name: 'Галилео', category: 'C', salary: 1000, kpiTO: 600, kpiFocus: 200, kpiService: 200, overPercent: 20, planFeb: 24900, planMar: 27200, planApr:24500},
+  {name: 'Скала', category: 'C', salary: 1000, kpiTO: 600, kpiFocus: 200, kpiService: 200, overPercent: 20, planFeb: 26200, planMar: 28600, planApr:24500},
+  {name: 'Арена', category: 'D', salary: 900, kpiTO: 540, kpiFocus: 180, kpiService: 180, overPercent: 18, planFeb: 20500, planMar: 22400, planApr:19900},
+  {name: 'Гродно', category: 'D', salary: 800, kpiTO: 480, kpiFocus: 160, kpiService: 160, overPercent: 16, planFeb: 22600, planMar: 24700, planApr:20900}
 ];
 
 const storeSelect = document.getElementById('store');
@@ -145,7 +146,11 @@ document.getElementById('month').addEventListener('change', function() {
 // Вызываем загрузку при старте
 loadSavedSelections();
 
-function daysInMonth(month) { return month==2 ? 28 : 31; }
+function daysInMonth(month) {
+  if (month == 2) return 28;
+  if (month == 4) return 30;
+  return 31;
+}
 
 document.getElementById('salaryForm').addEventListener('submit', function(e){
   e.preventDefault();
@@ -167,7 +172,16 @@ document.getElementById('salaryForm').addEventListener('submit', function(e){
   const salaryFact = (store.salary / (employeeType === "replacement" ? 15 : baseWorkDays)) * workedDays;
 
   // План продавца
-  const planStore = month===2 ? store.planFeb : store.planMar;
+  let planStore;
+if (month === 2) {
+  planStore = store.planFeb;
+} else if (month === 3) {
+  planStore = store.planMar;
+} else if (month === 4) {
+  planStore = store.planApr;
+} else {
+  planStore = store.planMar; // fallback
+}
   const planSeller = (planStore/monthDays)*workedDays;
 
   // % выполнения ТО
