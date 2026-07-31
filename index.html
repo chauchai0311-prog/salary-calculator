@@ -8,246 +8,484 @@
 <meta property="og:description" content="Онлайн-расчет зарплаты продавца с учетом KPI и перевыполнения плана">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://chauchai0311-prog.github.io/salary-calculator/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-  label { display: block; margin-top: 10px; }
-  input, select { width: 100%; padding: 5px; margin-top: 5px; }
-  button { margin-top: 15px; padding: 10px; width: 100%; background: #4CAF50; color: white; border: none; cursor: pointer; }
-  button:hover { background: #45a049; }
-  .result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
-  .kpi { margin-left: 10px; }
-  @media (max-width: 480px) { body { padding: 10px; } }
-.employee-type {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
+  :root {
+    --tea-green-900: #2f4a35;
+    --tea-green-700: #3f6844;
+    --tea-green-600: #4f7a52;
+    --tea-green-500: #6b9a5f;
+    --brown-800: #4a3728;
+    --brown-600: #7a5c42;
+    --brown-400: #a98467;
+    --beige-100: #f6efe3;
+    --beige-200: #efe4d1;
+    --beige-300: #e4d5bd;
+    --cream: #fffdf8;
+    --gold: #c9a24b;
+    --text: #33291f;
+    --text-soft: #6b5d4f;
+    --danger: #b23b3b;
+    --shadow: 0 10px 30px rgba(74, 55, 40, .12);
+    --shadow-sm: 0 2px 8px rgba(74, 55, 40, .08);
+    --radius: 14px;
+  }
 
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
+  * { box-sizing: border-box; }
 
-.radio-option input {
-  width: auto;
-}
+  body {
+    font-family: 'Nunito Sans', Arial, sans-serif;
+    color: var(--text);
+    margin: 0;
+    padding: 40px 16px;
+    background:
+      radial-gradient(1200px 600px at 100% -10%, rgba(107,154,95,.18), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(169,132,103,.20), transparent 55%),
+      var(--beige-100);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--cream);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid var(--beige-300);
+  }
+
+  .card__header {
+    background: linear-gradient(135deg, var(--tea-green-700), var(--tea-green-900));
+    color: var(--cream);
+    padding: 28px 30px 24px;
+    position: relative;
+  }
+  .card__header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(300px 120px at 90% 0%, rgba(201,162,75,.25), transparent 70%);
+    pointer-events: none;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; position: relative; }
+  .brand__leaf {
+    width: 40px; height: 40px; flex: none;
+    display: grid; place-items: center;
+    background: rgba(255,255,255,.12);
+    border-radius: 12px;
+  }
+  .brand__leaf svg { width: 24px; height: 24px; }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; line-height: 1.2;
+    margin: 0; font-weight: 700;
+  }
+  .card__subtitle {
+    margin: 4px 0 0; font-size: .85rem;
+    color: rgba(255,255,255,.75); font-weight: 400;
+  }
+
+  .card__body { padding: 26px 30px 30px; }
+
+  .employee-type {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 22px;
+    background: var(--beige-200);
+    padding: 6px;
+    border-radius: 12px;
+  }
+  .radio-option {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer; padding: 10px 12px; border-radius: 9px;
+    font-weight: 600; font-size: .92rem; color: var(--text-soft);
+    transition: all .2s ease; user-select: none;
+  }
+  .radio-option input { position: absolute; opacity: 0; pointer-events: none; }
+  .radio-option:has(input:checked) {
+    background: var(--cream); color: var(--tea-green-900); box-shadow: var(--shadow-sm);
+  }
+  .radio-option:hover { color: var(--tea-green-700); }
+
+  label.field {
+    display: block; margin-top: 16px;
+    font-size: .82rem; font-weight: 700; letter-spacing: .02em;
+    color: var(--text-soft); text-transform: uppercase;
+  }
+  input, select {
+    width: 100%; padding: 12px 14px; margin-top: 7px;
+    font-size: 1rem; font-family: inherit; color: var(--text);
+    background: var(--cream); border: 1.5px solid var(--beige-300);
+    border-radius: 10px;
+    transition: border-color .2s, box-shadow .2s, background .2s; outline: none;
+  }
+  input:hover, select:hover { border-color: var(--brown-400); }
+  input:focus, select:focus {
+    border-color: var(--tea-green-600);
+    box-shadow: 0 0 0 3.5px rgba(107,154,95,.20);
+  }
+  input:disabled {
+    background: var(--beige-200); color: var(--text-soft);
+    cursor: not-allowed; opacity: .7;
+  }
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%237a5c42' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 40px; cursor: pointer;
+  }
+
+  button {
+    margin-top: 26px; padding: 14px; width: 100%;
+    font-size: 1.02rem; font-weight: 800; letter-spacing: .01em; font-family: inherit;
+    color: var(--cream);
+    background: linear-gradient(135deg, var(--tea-green-600), var(--tea-green-900));
+    border: none; border-radius: 11px; cursor: pointer;
+    transition: transform .12s ease, box-shadow .2s ease, filter .2s;
+    box-shadow: 0 6px 18px rgba(63,104,68,.35);
+  }
+  button:hover { filter: brightness(1.06); box-shadow: 0 8px 22px rgba(63,104,68,.42); }
+  button:active { transform: translateY(1px); }
+
+  .result {
+    margin-top: 26px; padding: 0;
+    border: 1px solid var(--beige-300); border-radius: 12px;
+    overflow: hidden; background: var(--cream);
+    box-shadow: var(--shadow-sm); animation: fadeIn .35s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .result__title {
+    background: var(--beige-200); color: var(--tea-green-900);
+    font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem;
+    padding: 14px 20px; border-bottom: 1px solid var(--beige-300);
+  }
+  .result__rows { padding: 8px 20px; }
+  .result__row {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 10px 0; border-bottom: 1px dashed var(--beige-300); font-size: .95rem;
+  }
+  .result__row:last-child { border-bottom: none; }
+  .result__row .label { color: var(--text-soft); }
+  .result__row .value { font-weight: 700; color: var(--brown-800); white-space: nowrap; }
+  .result__row .badge {
+    font-size: .78rem; font-weight: 700; color: var(--tea-green-700);
+    background: rgba(107,154,95,.15); padding: 1px 7px; border-radius: 20px; margin-left: 6px;
+  }
+  .result__total {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--tea-green-700), var(--tea-green-900));
+    color: var(--cream);
+  }
+  .result__total .label { font-weight: 700; font-size: 1.05rem; }
+  .result__total .value {
+    font-family: 'Nunito Sans', Arial, sans-serif;
+    font-weight: 800; font-size: 1.75rem; color: #f5e7c0;
+    letter-spacing: .02em;
+  }
+
+  .footer-note {
+    text-align: center; margin-top: 18px; font-size: .78rem; color: var(--text-soft);
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 20px 10px; }
+    .card__header { padding: 22px 20px; }
+    .card__body { padding: 22px 20px 26px; }
+    h1 { font-size: 1.3rem; }
+    .result__total .value { font-size: 1.3rem; }
+  }
 </style>
 </head>
 <body>
-<h2>Калькулятор зарплаты продавца</h2>
-<form id="salaryForm">
-<div class="employee-type">
-  <label class="radio-option">
-    <input type="radio" name="employeeType" value="main" checked>
-    <span>Основной сотрудник</span>
-  </label>
+<div class="card">
+  <header class="card__header">
+    <div class="brand">
+      <span class="brand__leaf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f5e7c0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20C6 20 4 15 4 11c5 0 8 2 9 6"/>
+          <path d="M20 4c0 8-4 12-9 14 0-6 3-12 9-14z"/>
+        </svg>
+      </span>
+      <div>
+        <h1>Калькулятор зарплаты</h1>
+        <p class="card__subtitle">Расчёт с учётом KPI и перевыполнения плана</p>
+      </div>
+    </div>
+  </header>
 
-  <label class="radio-option">
-    <input type="radio" name="employeeType" value="replacement">
-    <span>Замена</span>
-  </label>
+  <div class="card__body">
+    <form id="salaryForm">
+      <div class="employee-type">
+        <label class="radio-option">
+          <input type="radio" name="employeeType" value="main" checked>
+          <span>Основной сотрудник</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="employeeType" value="replacement">
+          <span>Замена</span>
+        </label>
+      </div>
+
+      <label class="field">Магазин
+        <select id="store"></select>
+      </label>
+      <label class="field">Месяц
+        <select id="month"></select>
+      </label>
+      <label class="field">Отработанные дни
+        <input type="number" id="workedDays" min="1" required>
+      </label>
+      <label class="field">Фактический ТО (BYN)
+        <input type="number" id="actualTO" min="0" required>
+      </label>
+      <label class="field">% фокусных продаж
+        <input type="number" id="focusPercent" min="0" max="200" required>
+      </label>
+      <label class="field">% сервиса
+        <input type="number" id="servicePercent" min="0" max="200" required>
+      </label>
+      <button type="submit">Рассчитать зарплату</button>
+    </form>
+
+    <div class="result" id="result" style="display:none;"></div>
+  </div>
 </div>
-
-  <label>Магазин
-    <select id="store"></select>
-  </label>
-  <label>Месяц
-    <select id="month">
-      <option value="2">Февраль 2026</option>
-      <option value="3">Март 2026</option>
-      <option value="4">Апрель 2026</option>
-      <option value="5">Май 2026</option>
-      <option value="6">Июнь 2026</option>
-      <option value="7">Июль 2026</option>
-    </select>
-  </label>
-  <label>Отработанные дни
-    <input type="number" id="workedDays" min="1" required>
-  </label>
-  <label>Фактический ТО (BYN)
-    <input type="number" id="actualTO" min="0" required>
-  </label>
-  <label>% фокусных продаж
-    <input type="number" id="focusPercent" min="0" max="200" required>
-  </label>
-  <label>% сервиса
-    <input type="number" id="servicePercent" min="0" max="200" required>
-  </label>
-  <button type="submit">Рассчитать зарплату</button>
-</form>
-<div class="result" id="result" style="display:none;"></div>
 <script>
-const stores = [
-  {name: 'Грин', category: 'A', salary: 1250, kpiTO: 750, kpiFocus: 250, kpiService: 250, overPercent: 25, planFeb: 62700, planMar: 68500, planApr:62900, planMay:60000, planJun:55000, planJul:52000},
-  {name: 'Дана', category: 'A', salary: 1250, kpiTO: 750, kpiFocus: 250, kpiService: 250, overPercent: 25, planFeb: 77800, planMar: 85100, planApr:69500, planMay:67500, planJun:61000, planJul:55000},
-  {name: 'Простор', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 38400, planMar: 43000, planApr:38500, planMay:36500, planJun:33000, planJul:30000},
-  {name: 'Галерея', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 46400, planMar: 50700, planApr:41300, planMay:41500, planJun:37500, planJul:36000},
-  {name: 'Замок', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 42200, planMar: 46100, planApr:38500, planMay:38500, planJun:35000, planJul:32000},
-  {name: 'Момо', category: 'B', salary: 1100, kpiTO: 660, kpiFocus: 220, kpiService: 220, overPercent: 22, planFeb: 47500, planMar: 51900, planApr:46500, planMay:50000, planJun:45000, planJul:42000},
-  {name: 'Галилео', category: 'C', salary: 1000, kpiTO: 600, kpiFocus: 200, kpiService: 200, overPercent: 20, planFeb: 24900, planMar: 27200, planApr:24500, planMay:24000, planJun:24000, planJul:22000},
-  {name: 'Скала', category: 'C', salary: 1000, kpiTO: 600, kpiFocus: 200, kpiService: 200, overPercent: 20, planFeb: 26200, planMar: 28600, planApr:24500, planMay:24500, planJun:22000, planJul:21000},
-  {name: 'Арена', category: 'D', salary: 900, kpiTO: 540, kpiFocus: 180, kpiService: 180, overPercent: 18, planFeb: 20500, planMar: 22400, planApr:19900, planMay:22500, planJun:19000, planJul:17000},
-  {name: 'Гродно', category: 'D', salary: 800, kpiTO: 480, kpiFocus: 160, kpiService: 160, overPercent: 16, planFeb: 22600, planMar: 24700, planApr:20900, planMay:20900, planJun:18000, planJul:17000}
+"use strict";
+
+/* =========================================================
+   1. НАСТРОЙКИ (тут делаются все ручные правки)
+   ========================================================= */
+
+const YEAR = 2026;
+
+const MONTHS = [
+  { num: 2, label: 'Февраль' },
+  { num: 3, label: 'Март' },
+  { num: 4, label: 'Апрель' },
+  { num: 5, label: 'Май' },
+  { num: 6, label: 'Июнь' },
+  { num: 7, label: 'Июль' },
+  { num: 8, label: 'Август' }
 ];
-const storeSelect = document.getElementById('store');
-stores.forEach(s => { let opt = document.createElement('option'); opt.value = s.name; opt.textContent = s.name; storeSelect.appendChild(opt); });
 
+const BASE_WORK_DAYS_BY_MONTH = { 2: 14 };
+const DEFAULT_BASE_WORK_DAYS = 15;
+const REPLACEMENT_BASE_DAYS = 15;
+const KPI_THRESHOLD = 85;
+
+const stores = [
+  {name:'Грин',    category:'A', salary:1250, kpiTO:750, kpiFocus:250, kpiService:250, overPercent:25,
+   plans:{2:62700, 3:68500, 4:62900, 5:60000, 6:55000, 7:52000, 8:54000}},
+  {name:'Дана',    category:'A', salary:1250, kpiTO:750, kpiFocus:250, kpiService:250, overPercent:25,
+   plans:{2:77800, 3:85100, 4:69500, 5:67500, 6:61000, 7:55000, 8:58000}},
+  {name:'Простор', category:'B', salary:1100, kpiTO:660, kpiFocus:220, kpiService:220, overPercent:22,
+   plans:{2:38400, 3:43000, 4:38500, 5:36500, 6:33000, 7:30000, 8:35000}},
+  {name:'Галерея', category:'B', salary:1100, kpiTO:660, kpiFocus:220, kpiService:220, overPercent:22,
+   plans:{2:46400, 3:50700, 4:41300, 5:41500, 6:37500, 7:36000, 8:38000}},
+  {name:'Замок',   category:'B', salary:1100, kpiTO:660, kpiFocus:220, kpiService:220, overPercent:22,
+   plans:{2:42200, 3:46100, 4:38500, 5:38500, 6:35000, 7:32000, 8:32000}},
+  {name:'Момо',    category:'B', salary:1100, kpiTO:660, kpiFocus:220, kpiService:220, overPercent:22,
+   plans:{2:47500, 3:51900, 4:46500, 5:50000, 6:45000, 7:42000, 8:45000}},
+  {name:'Галилео', category:'C', salary:1000, kpiTO:600, kpiFocus:200, kpiService:200, overPercent:20,
+   plans:{2:24900, 3:27200, 4:24500, 5:24000, 6:24000, 7:22000, 8:24000}},
+  {name:'Скала',   category:'C', salary:1000, kpiTO:600, kpiFocus:200, kpiService:200, overPercent:20,
+   plans:{2:26200, 3:28600, 4:24500, 5:24500, 6:22000, 7:21000, 8:21000}},
+  {name:'Арена',   category:'D', salary:900,  kpiTO:540, kpiFocus:180, kpiService:180, overPercent:18,
+   plans:{2:20500, 3:22400, 4:19900, 5:22500, 6:19000, 7:17000, 8:18000}},
+  {name:'Гродно',  category:'D', salary:800,  kpiTO:480, kpiFocus:160, kpiService:160, overPercent:16,
+   plans:{2:22600, 3:24700, 4:20900, 5:20900, 6:18000, 7:17000, 8:20000}}
+];
+
+/* =========================================================
+   2. ССЫЛКИ НА DOM
+   ========================================================= */
+
+const storeSelect    = document.getElementById('store');
+const monthSelect    = document.getElementById('month');
+const workedDaysInp  = document.getElementById('workedDays');
+const actualTOInp    = document.getElementById('actualTO');
+const focusInput     = document.getElementById('focusPercent');
+const serviceInput   = document.getElementById('servicePercent');
+const resultBox      = document.getElementById('result');
+const form           = document.getElementById('salaryForm');
 const employeeRadios = document.querySelectorAll('input[name="employeeType"]');
-const focusInput = document.getElementById('focusPercent');
-const serviceInput = document.getElementById('servicePercent');
 
-function toggleKPIFields() {
-  const selectedType = document.querySelector('input[name="employeeType"]:checked').value;
+/* =========================================================
+   3. ЗАПОЛНЕНИЕ СПИСКОВ
+   ========================================================= */
 
-  if (selectedType === "replacement") {
-    focusInput.disabled = true;
-    serviceInput.disabled = true;
-    focusInput.value = '';
-    serviceInput.value = '';
-  } else {
-    focusInput.disabled = false;
-    serviceInput.disabled = false;
-  }
-}
-
-employeeRadios.forEach(radio => {
-  radio.addEventListener('change', toggleKPIFields);
+stores.forEach(s => {
+  const opt = document.createElement('option');
+  opt.value = s.name;
+  opt.textContent = s.name;
+  storeSelect.appendChild(opt);
 });
 
-toggleKPIFields();
-// Загрузка сохранённых значений из localStorage
-function loadSavedSelections() {
-  const savedStore = localStorage.getItem('selectedStore');
-  const savedMonth = localStorage.getItem('selectedMonth');
-  
-  if (savedStore) {
-    // Проверяем, существует ли магазин с таким названием в списке
-    const storeExists = Array.from(storeSelect.options).some(opt => opt.value === savedStore);
-    if (storeExists) storeSelect.value = savedStore;
-  }
-  
-  if (savedMonth) {
-    const monthSelect = document.getElementById('month');
-    const monthExists = Array.from(monthSelect.options).some(opt => opt.value === savedMonth);
-    if (monthExists) monthSelect.value = savedMonth;
-  }
-}
-
-// Сохранение при изменении магазина
-storeSelect.addEventListener('change', function() {
-  localStorage.setItem('selectedStore', storeSelect.value);
+MONTHS.forEach(m => {
+  const opt = document.createElement('option');
+  opt.value = String(m.num);
+  opt.textContent = `${m.label} ${YEAR}`;
+  monthSelect.appendChild(opt);
 });
 
-// Сохранение при изменении месяца
-document.getElementById('month').addEventListener('change', function() {
-  localStorage.setItem('selectedMonth', this.value);
-});
+/* =========================================================
+   4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+   ========================================================= */
 
-// Вызываем загрузку при старте
-loadSavedSelections();
-
-function daysInMonth(month) {
-  if (month == 2) return 28;
-  if (month == 4) return 30;
-  if (month == 6) return 30;
-  return 31;
+function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate();
 }
-
-document.getElementById('salaryForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const storeName = storeSelect.value;
-  const month = parseInt(document.getElementById('month').value);
-  const workedDays = parseInt(document.getElementById('workedDays').value);
-  const actualTO = parseFloat(document.getElementById('actualTO').value);
-  const focusPercent = parseFloat(document.getElementById('focusPercent').value);
-  const servicePercent = parseFloat(document.getElementById('servicePercent').value);
-  const employeeType = document.querySelector('input[name="employeeType"]:checked').value;
-
-  if(workedDays <= 0){ alert('Введите рабочие дни больше 0'); return; }
-
-  const store = stores.find(s=>s.name===storeName);
-  const monthDays = daysInMonth(month);
-  const baseWorkDays = month===2 ? 14 : 15;
-
-  // Оклад
-  const salaryFact = (store.salary / (employeeType === "replacement" ? 15 : baseWorkDays)) * workedDays;
-
-  // План продавца
-  let planStore;
-if (month === 2) {
-  planStore = store.planFeb;
-} else if (month === 3) {
-  planStore = store.planMar;
-} else if (month === 4) {
-  planStore = store.planApr;
-} else if (month === 5) {
-  planStore = store.planMay;
-  } else if (month === 6) {        
-  planStore = store.planJun; 
-  } else if (month === 7) {         
-  planStore = store.planJul;
-} else {
-  planStore = store.planMay; // fallback лучше на последний месяц
+function baseWorkDaysFor(month) {
+  return BASE_WORK_DAYS_BY_MONTH[month] ?? DEFAULT_BASE_WORK_DAYS;
 }
-  const planSeller = (planStore/monthDays)*workedDays;
-
-  // % выполнения ТО
-  const percentTO = planSeller > 0 ? (actualTO/planSeller)*100 : 0;
-  const overPercentValue = percentTO > 100 ? Math.floor(percentTO - 100) : 0;
-  
-  let kpiTO = 0;
-let overTO = 0;
-let kpiFocus = 0;
-let kpiServiceRes = 0;
-
-if (employeeType === "replacement") {
-
-  // Замена — база всегда 15 дней
-  const salaryReplacementBase = (store.salary / 15) * workedDays;
-
-  // KPI ТО без ограничений и порогов
-  kpiTO = (percentTO / 100) * salaryReplacementBase;
-
-} else {
-
-  // Основной сотрудник
-
-  const kpiTOBase = (store.kpiTO / baseWorkDays) * workedDays;
-  const percentTOForKPI = percentTO > 100 ? 100 : percentTO;
-  kpiTO = (percentTOForKPI / 100) * kpiTOBase;
-
- overTO = overPercentValue > 0
-  ? overPercentValue * store.overPercent * (workedDays / baseWorkDays)
-  : 0;
-
-  const kpiFocusBase = (store.kpiFocus / baseWorkDays) * workedDays;
-  if (focusPercent >= 85) kpiFocus = kpiFocusBase;
-
-  const kpiServiceBase = (store.kpiService / baseWorkDays) * workedDays;
-  if (servicePercent >= 85) kpiServiceRes = kpiServiceBase;
-}
-
-
-  const total = salaryFact + kpiTO + overTO + kpiFocus + kpiServiceRes;
-
-  // Функция форматирования
 function formatBYN(value) {
   return Math.round(value).toLocaleString('ru-RU');
 }
+function getSelectedEmployeeType() {
+  return document.querySelector('input[name="employeeType"]:checked').value;
+}
 
-document.getElementById('result').style.display='block';
-document.getElementById('result').innerHTML = `
-  <strong>Результаты расчета:</strong><br>
-  План продавца: ${formatBYN(planSeller)} BYN<br>
-  Оклад: ${formatBYN(salaryFact)} BYN<br>
-  KPI ТО (${percentTO.toFixed(1).replace('.', ',')}%): ${formatBYN(kpiTO)} BYN<br>
-  Перевыполнение ТО ${overPercentValue > 0 ? `(${Math.round(overPercentValue)}%)` : ''}: ${formatBYN(overTO)} BYN<br>
-  KPI Фокус: ${formatBYN(kpiFocus)} BYN<br>
-  KPI Сервис: ${formatBYN(kpiServiceRes)} BYN<br>
-  <strong>Итого: ${formatBYN(total)} BYN</strong>
-`;
+/* =========================================================
+   5. РЕЖИМ "ЗАМЕНА"
+   ========================================================= */
+
+function toggleKPIFields() {
+  const isReplacement = getSelectedEmployeeType() === 'replacement';
+  [focusInput, serviceInput].forEach(inp => {
+    inp.disabled = isReplacement;
+    inp.required = !isReplacement;
+    if (isReplacement) inp.value = '';
+  });
+}
+employeeRadios.forEach(radio => radio.addEventListener('change', toggleKPIFields));
+toggleKPIFields();
+
+/* =========================================================
+   6. localStorage
+   ========================================================= */
+
+function loadSavedSelections() {
+  const savedStore = localStorage.getItem('selectedStore');
+  const savedMonth = localStorage.getItem('selectedMonth');
+  if (savedStore && [...storeSelect.options].some(o => o.value === savedStore)) {
+    storeSelect.value = savedStore;
+  }
+  if (savedMonth && [...monthSelect.options].some(o => o.value === savedMonth)) {
+    monthSelect.value = savedMonth;
+  }
+}
+storeSelect.addEventListener('change', () => localStorage.setItem('selectedStore', storeSelect.value));
+monthSelect.addEventListener('change', () => localStorage.setItem('selectedMonth', monthSelect.value));
+loadSavedSelections();
+
+/* =========================================================
+   7. РАСЧЁТ
+   ========================================================= */
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const storeName     = storeSelect.value;
+  const month         = parseInt(monthSelect.value, 10);
+  const workedDays    = parseInt(workedDaysInp.value, 10);
+  const actualTO      = parseFloat(actualTOInp.value);
+  const isReplacement = getSelectedEmployeeType() === 'replacement';
+
+  const focusPercent   = isReplacement ? 0 : parseFloat(focusInput.value);
+  const servicePercent = isReplacement ? 0 : parseFloat(serviceInput.value);
+
+  // --- Валидация ---
+  const store = stores.find(s => s.name === storeName);
+  if (!store) { alert('Магазин не найден'); return; }
+  if (!Number.isFinite(workedDays) || workedDays <= 0) { alert('Введите рабочие дни больше 0'); return; }
+  if (!Number.isFinite(actualTO) || actualTO < 0) { alert('Введите корректный фактический ТО'); return; }
+
+  const planStore = store.plans[month];
+  if (planStore === undefined) { alert('Для выбранного месяца нет плана по этому магазину'); return; }
+
+  // --- Базовые величины ---
+  const monthDays      = daysInMonth(YEAR, month);
+  const baseWorkDays   = baseWorkDaysFor(month);
+  const salaryBaseDays = isReplacement ? REPLACEMENT_BASE_DAYS : baseWorkDays;
+
+  const salaryFact = (store.salary / salaryBaseDays) * workedDays;
+  const planSeller = (planStore / monthDays) * workedDays;
+
+  const percentTO = planSeller > 0 ? (actualTO / planSeller) * 100 : 0;
+  const overPercentValue = percentTO > 100 ? Math.floor(percentTO - 100) : 0;
+
+  // --- KPI ---
+  let kpiTO = 0, overTO = 0, kpiFocus = 0, kpiServiceRes = 0;
+
+  if (isReplacement) {
+    const salaryReplacementBase = (store.salary / REPLACEMENT_BASE_DAYS) * workedDays;
+    kpiTO = (percentTO / 100) * salaryReplacementBase;
+  } else {
+    const kpiTOBase = (store.kpiTO / baseWorkDays) * workedDays;
+    kpiTO = (Math.min(percentTO, 100) / 100) * kpiTOBase;
+
+    overTO = overPercentValue > 0
+      ? overPercentValue * store.overPercent * (workedDays / baseWorkDays)
+      : 0;
+
+    if (Number.isFinite(focusPercent) && focusPercent >= KPI_THRESHOLD) {
+      kpiFocus = (store.kpiFocus / baseWorkDays) * workedDays;
+    }
+    if (Number.isFinite(servicePercent) && servicePercent >= KPI_THRESHOLD) {
+      kpiServiceRes = (store.kpiService / baseWorkDays) * workedDays;
+    }
+  }
+
+  const total = salaryFact + kpiTO + overTO + kpiFocus + kpiServiceRes;
+
+  // --- Вывод ---
+  const percentLabel = percentTO.toFixed(1).replace('.', ',');
+  const overBadge = overPercentValue > 0 ? `<span class="badge">+${overPercentValue}%</span>` : '';
+
+  const rows = [
+    { label: 'План продавца', value: planSeller },
+    { label: 'Оклад', value: salaryFact },
+    { label: `KPI ТО <span class="badge">${percentLabel}%</span>`, value: kpiTO }
+  ];
+
+  // Строки, актуальные только для основного сотрудника
+  if (!isReplacement) {
+    rows.push({ label: `Перевыполнение ТО ${overBadge}`, value: overTO });
+    rows.push({ label: 'KPI Фокус', value: kpiFocus });
+    rows.push({ label: 'KPI Сервис', value: kpiServiceRes });
+  }
+
+  const rowsHTML = rows.map(r => `
+    <div class="result__row">
+      <span class="label">${r.label}</span>
+      <span class="value">${formatBYN(r.value)} BYN</span>
+    </div>
+  `).join('');
+
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = `
+    <div class="result__title">Результаты расчёта</div>
+    <div class="result__rows">
+      ${rowsHTML}
+    </div>
+    <div class="result__total">
+      <span class="label">Итого к выплате</span>
+      <span class="value">${formatBYN(total)} BYN</span>
+    </div>
+  `;
+
+  // Плавная прокрутка к результату
+  resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 });
 </script>
 </body>
