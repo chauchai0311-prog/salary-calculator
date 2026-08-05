@@ -13,10 +13,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --tea-green-900: #2f4a35;
-    --tea-green-700: #3f6844;
-    --tea-green-600: #4f7a52;
-    --tea-green-500: #6b9a5f;
+    --tea-green-900: #2e5e0a;
+    --tea-green-700: #2e5e0a;
+    --tea-green-600: #3d7810;
+    --tea-green-500: #52991a;
     --brown-800: #4a3728;
     --brown-600: #7a5c42;
     --brown-400: #a98467;
@@ -63,9 +63,10 @@
   .card__header {
     background: linear-gradient(135deg, var(--tea-green-700), var(--tea-green-900));
     color: var(--cream);
-    padding: 28px 30px 24px;
+    padding: 20px 30px;
     position: relative;
   }
+
   .card__header::after {
     content: "";
     position: absolute;
@@ -73,22 +74,58 @@
     background: radial-gradient(300px 120px at 90% 0%, rgba(201,162,75,.25), transparent 70%);
     pointer-events: none;
   }
-  .brand { display: flex; align-items: center; gap: 12px; position: relative; }
-  .brand__leaf {
-    width: 40px; height: 40px; flex: none;
-    display: grid; place-items: center;
-    background: rgba(255,255,255,.12);
-    border-radius: 12px;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
   }
-  .brand__leaf svg { width: 24px; height: 24px; }
+
+  .brand__logo {
+    width: 90px;
+    height: 90px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border-radius: 0;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .brand__logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .header-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
   h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem; line-height: 1.2;
-    margin: 0; font-weight: 700;
+    font-family: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
+    font-size: 1.75rem;
+    line-height: 1.1;
+    margin: 0 0 4px 0;
+    font-weight: 700;
+    letter-spacing: .01em;
+    color: var(--cream);
   }
+
   .card__subtitle {
-    margin: 4px 0 0; font-size: .85rem;
-    color: rgba(255,255,255,.75); font-weight: 400;
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, .8);
+    font-weight: 400;
+    font-family: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
+    white-space: nowrap;
   }
 
   .card__body { padding: 26px 30px 30px; }
@@ -164,7 +201,7 @@
 
   .result__title {
     background: var(--beige-200); color: var(--tea-green-900);
-    font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem;
+    font-family: 'Nunito Sans', 'Segoe UI', Arial, sans-serif; font-weight: 700; font-size: 1.1rem;
     padding: 14px 20px; border-bottom: 1px solid var(--beige-300);
   }
   .result__rows { padding: 8px 20px; }
@@ -187,7 +224,7 @@
   }
   .result__total .label { font-weight: 700; font-size: 1.05rem; }
   .result__total .value {
-    font-family: 'Nunito Sans', Arial, sans-serif;
+    font-family: 'Nunito Sans', 'Segoe UI', Arial, sans-serif;
     font-weight: 800; font-size: 1.75rem; color: #f5e7c0;
     letter-spacing: .02em;
   }
@@ -198,24 +235,43 @@
 
   @media (max-width: 480px) {
     body { padding: 20px 10px; }
-    .card__header { padding: 22px 20px; }
+    .card__header { padding: 16px 20px; }
     .card__body { padding: 22px 20px 26px; }
-    h1 { font-size: 1.3rem; }
-    .result__total .value { font-size: 1.3rem; }
+
+    .header-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .brand__logo {
+        width: 80px;
+        height: 80px;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+        white-space: normal;
+    }
+
+    .card__subtitle {
+        white-space: normal;
+        font-size: 0.85rem;
+    }
+
+    .result__total .value { font-size: 1.4rem; }
   }
 </style>
 </head>
 <body>
 <div class="card">
   <header class="card__header">
-    <div class="brand">
-      <span class="brand__leaf">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#f5e7c0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M11 20C6 20 4 15 4 11c5 0 8 2 9 6"/>
-          <path d="M20 4c0 8-4 12-9 14 0-6 3-12 9-14z"/>
-        </svg>
+    <div class="header-content">
+      <span class="brand__logo">
+        <img src="logo.jpg" alt="Логотип компании">
       </span>
-      <div>
+      <div class="header-text">
         <h1>Калькулятор зарплаты</h1>
         <p class="card__subtitle">Расчёт с учётом KPI и перевыполнения плана</p>
       </div>
