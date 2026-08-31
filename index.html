@@ -312,10 +312,10 @@
         <input type="number" id="actualTO" min="0" required>
       </label>
       <label class="field">% фокусных продаж
-        <input type="number" id="focusPercent" min="0" max="200" required>
+        <input type="number" id="focusPercent" min="0" max="900" required>
       </label>
       <label class="field">% сервиса
-        <input type="number" id="servicePercent" min="0" max="200" required>
+        <input type="number" id="servicePercent" min="0" max="100" required>
       </label>
       <button type="submit">Рассчитать зарплату</button>
     </form>
@@ -339,7 +339,8 @@ const MONTHS = [
   { num: 5, label: 'Май' },
   { num: 6, label: 'Июнь' },
   { num: 7, label: 'Июль' },
-  { num: 8, label: 'Август' }
+  { num: 8, label: 'Август' },
+  { num: 9, label: 'Сентябрь' }
 ];
 
 const BASE_WORK_DAYS_BY_MONTH = { 2: 14 };
@@ -349,25 +350,25 @@ const KPI_THRESHOLD = 85;
 
 const stores = [
   {name:'Грин',    category:'A', salary:1250, kpiTO:750, kpiFocus:250, kpiService:250, overPercent:25,
-   plans:{2:62700, 3:68500, 4:62900, 5:60000, 6:55000, 7:52000, 8:54000}},
+   plans:{2:62700, 3:68500, 4:62900, 5:60000, 6:55000, 7:52000, 8:54000, 9:63000}},
   {name:'Дана',    category:'A', salary:1250, kpiTO:750, kpiFocus:250, kpiService:250, overPercent:25,
-   plans:{2:77800, 3:85100, 4:69500, 5:67500, 6:61000, 7:55000, 8:58000}},
+   plans:{2:77800, 3:85100, 4:69500, 5:67500, 6:61000, 7:55000, 8:58000, 9:68000}},
   {name:'Простор', category:'B', salary:1100, kpiTO:660, kpiFocus:220, kpiService:220, overPercent:22,
-   plans:{2:38400, 3:43000, 4:38500, 5:36500, 6:33000, 7:30000, 8:35000}},
+   plans:{2:38400, 3:43000, 4:38500, 5:36500, 6:33000, 7:30000, 8:35000, 9:41000}},
   {name:'Галерея', category:'B', salary:1100, kpiTO:660, kpiFocus:220, kpiService:220, overPercent:22,
-   plans:{2:46400, 3:50700, 4:41300, 5:41500, 6:37500, 7:36000, 8:38000}},
+   plans:{2:46400, 3:50700, 4:41300, 5:41500, 6:37500, 7:36000, 8:38000, 9:40500}},
   {name:'Замок',   category:'B', salary:1100, kpiTO:660, kpiFocus:220, kpiService:220, overPercent:22,
-   plans:{2:42200, 3:46100, 4:38500, 5:38500, 6:35000, 7:32000, 8:32000}},
+   plans:{2:42200, 3:46100, 4:38500, 5:38500, 6:35000, 7:32000, 8:32000, 9:37000}},
   {name:'Момо',    category:'B', salary:1100, kpiTO:660, kpiFocus:220, kpiService:220, overPercent:22,
-   plans:{2:47500, 3:51900, 4:46500, 5:50000, 6:45000, 7:42000, 8:45000}},
+   plans:{2:47500, 3:51900, 4:46500, 5:50000, 6:45000, 7:42000, 8:45000, 9:50000}},
   {name:'Галилео', category:'C', salary:1000, kpiTO:600, kpiFocus:200, kpiService:200, overPercent:20,
-   plans:{2:24900, 3:27200, 4:24500, 5:24000, 6:24000, 7:22000, 8:24000}},
+   plans:{2:24900, 3:27200, 4:24500, 5:24000, 6:24000, 7:22000, 8:24000, 9:25000}},
   {name:'Скала',   category:'C', salary:1000, kpiTO:600, kpiFocus:200, kpiService:200, overPercent:20,
-   plans:{2:26200, 3:28600, 4:24500, 5:24500, 6:22000, 7:21000, 8:21000}},
+   plans:{2:26200, 3:28600, 4:24500, 5:24500, 6:22000, 7:21000, 8:21000, 9:22000}},
   {name:'Арена',   category:'D', salary:900,  kpiTO:540, kpiFocus:180, kpiService:180, overPercent:18,
-   plans:{2:20500, 3:22400, 4:19900, 5:22500, 6:19000, 7:17000, 8:18000}},
+   plans:{2:20500, 3:22400, 4:19900, 5:22500, 6:19000, 7:17000, 8:18000, 9:20000}},
   {name:'Гродно',  category:'D', salary:800,  kpiTO:480, kpiFocus:160, kpiService:160, overPercent:16,
-   plans:{2:22600, 3:24700, 4:20900, 5:20900, 6:18000, 7:17000, 8:20000}}
+   plans:{2:22600, 3:24700, 4:20900, 5:20900, 6:18000, 7:17000, 8:20000, 9:20500}}
 ];
 
 /* =========================================================
